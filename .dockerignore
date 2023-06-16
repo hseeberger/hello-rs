@@ -1,0 +1,9 @@
+.github
+**/.git
+**/target
+Dockerfile
+justfile
+k8s
+LICENSE
+README.md
+release.toml
