@@ -31,7 +31,10 @@ RUST_LOG=hello_rs=debug,info \
 To build the Docker image, from the workspace root directory:
 
 ```
-docker build -t hseeberger/hello-rs .
+docker build \
+  -t hseeberger/hello-rs \
+  --build-arg RUST_VERSION=1.70.0 \
+  .
 ```
 
 To run the Docker image:

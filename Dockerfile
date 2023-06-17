@@ -1,4 +1,6 @@
-FROM rust:1.70-bullseye AS builder
+ARG RUST_VERSION=1.70.0
+
+FROM rust:${RUST_VERSION}-bullseye AS builder
 WORKDIR /root/hello-rs
 COPY . .
 RUN cargo build --release --package hello-rs
