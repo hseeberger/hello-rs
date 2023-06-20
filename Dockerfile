@@ -10,3 +10,4 @@ COPY --from=builder /root/hello-rs/target/release/hello-rs /usr/local/bin/hello-
 COPY --from=builder /root/hello-rs/config /opt/hello-rs/config
 WORKDIR /opt/hello-rs
 ENTRYPOINT ["hello-rs"]
+EXPOSE 80/tcp
