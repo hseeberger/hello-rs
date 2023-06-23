@@ -9,6 +9,12 @@ check:
 test:
 	cargo test
 
+run:
+	RUST_LOG=hello_rs=debug,info \
+		APP__API__PORT=8080 \
+		cargo run -p hello-rs \
+		| jq
+
 docker:
 	docker build \
 		-t hseeberger/hello-rs \
