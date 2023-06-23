@@ -3,9 +3,7 @@ mod api;
 use anyhow::{Context, Result};
 use configured::Configured;
 use serde::Deserialize;
-use std::time::Duration;
-use tokio::{task, time};
-use tracing::{error, info, warn};
+use tracing::{error, info};
 use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
 #[tokio::main]
@@ -33,13 +31,6 @@ async fn run() -> Result<()> {
     let config = Config::load().context("load configuration")?;
 
     info!(?config, "starting");
-
-    task::spawn(async {
-        loop {
-            warn!("This is for the DigitalOcean team");
-            time::sleep(Duration::from_secs(2)).await;
-        }
-    });
 
     api::serve(config.api).await
 }
