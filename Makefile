@@ -4,10 +4,17 @@ rust_version = $(shell grep 'rust-version' Cargo.toml | grep -Eo '\d+\.\d+\.\d+'
 
 check:
 	cargo check --tests
-	cargo clippy
+
+fmt:
+	cargo +nightly fmt
+
+lint:
+	cargo clippy --no-deps -- -D warnings
 
 test:
 	cargo test
+
+all: fmt check lint test
 
 run:
 	RUST_LOG=hello_rs=debug,info \
