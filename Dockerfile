@@ -6,10 +6,9 @@ COPY . .
 RUN \
   --mount=type=cache,target=/app/target/ \
   --mount=type=cache,target=/usr/local/cargo/registry/ \
-  <<EOF
-cargo build --locked --release --package hello-rs
-cp ./target/release/hello-rs /app
-EOF
+  /bin/bash -c \
+  'cargo build --locked --release --package hello-rs && \
+  cp ./target/release/hello-rs /app'
 
 FROM debian:bullseye-slim AS final
 RUN adduser \
