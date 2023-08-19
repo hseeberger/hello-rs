@@ -1,12 +1,16 @@
 [package]
-name = "hello-rs"
-version = "0.1.0"
-rust-version = "1.71.0"
-edition = "2021"
-authors = [
-  "Heiko Seeberger <microsoft7b@quest47c.de>",
-]
-publish = false
+name          = "hello-rs"
+version       = "0.1.0"
+description   = "hello-tracing-backend"
+rust-version  = "1.71.0"
+edition       = "2021"
+authors       = [ "Heiko Seeberger <git@heikoseeberger.de>" ]
+license       = "Apache-2.0"
+readme        = "README.md"
+homepage      = "https://github.com/hseeberger/hello-rs"
+repository    = "https://github.com/hseeberger/hello-rs"
+documentation = "https://github.com/hseeberger/hello-rs"
+publish       = false
 
 [dependencies]
 anyhow             = { version = "1.0", features = [ "backtrace" ] }
