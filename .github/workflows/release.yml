@@ -12,6 +12,14 @@ jobs:
       - name: Check out
         uses: actions/checkout@v3
 
+      - name: Install just
+        uses: taiki-e/install-action@v2
+        with:
+          tool: just
+
+      - name: Run tests
+        run: just test
+
       - name: Docker metadata
         uses: docker/metadata-action@v4
         id: meta

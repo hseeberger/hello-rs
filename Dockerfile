@@ -1,4 +1,4 @@
-ARG RUST_VERSION=1.71.0
+ARG RUST_VERSION=1.72.1
 
 FROM rust:${RUST_VERSION}-slim-bullseye AS builder
 WORKDIR /app

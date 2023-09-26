@@ -1,12 +1,13 @@
 set shell := ["bash", "-uc"]
 
-rust_version := `grep 'rust-version' Cargo.toml | grep -Eo '\d+\.\d+\.\d+'`
-
 check:
 	cargo check --tests
 
 fmt:
 	cargo +nightly fmt
+
+fmt_check:
+	cargo +nightly fmt --check
 
 lint:
 	cargo clippy --no-deps -- -D warnings
@@ -25,5 +26,4 @@ run:
 docker:
 	docker build \
 		-t hseeberger/hello-rs \
-		--build-arg RUST_VERSION={{rust_version}} \
 		.
