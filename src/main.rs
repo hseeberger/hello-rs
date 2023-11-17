@@ -10,9 +10,9 @@ use tracing::{error, info};
 use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<()> {
     // If tracing initialization fails, nevertheless emit a structured log event.
-    if let Err(error) = init_tracing() {
+    init_tracing().inspect_err(|error| {
         let now = OffsetDateTime::now_utc().format(&Rfc3339).unwrap();
         let error = serde_json::to_string(&json!({
             "timestamp": now,
@@ -22,20 +22,19 @@ async fn main() {
         }));
         // Not using `eprintln!`, because `tracing_subscriber::fmt` uses stdout by default.
         println!("{}", error.unwrap());
-        return;
-    }
+    })?;
 
     // Replace the default panic hook with one that uses structured logging at ERROR level.
     panic::set_hook(Box::new(|panic| error!(%panic, "process panicked")));
 
     // Run and log any error.
-    if let Err(error) = run().await {
+    run().await.inspect_err(|error| {
         error!(
             error = format!("{error:#}"),
             backtrace = %error.backtrace(),
             "process exited with ERROR"
         );
-    };
+    })
 }
 
 #[derive(Debug, Deserialize)]
