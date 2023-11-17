@@ -1,16 +1,15 @@
-ARG RUST_VERSION=1.73.0
+ARG RUST_VERSION=1.74.0
 
-FROM rust:${RUST_VERSION}-slim-bullseye AS builder
+FROM rust:${RUST_VERSION}-slim-bookworm AS builder
 WORKDIR /app
 COPY . .
 RUN \
   --mount=type=cache,target=/app/target/ \
   --mount=type=cache,target=/usr/local/cargo/registry/ \
-  /bin/bash -c \
-  'cargo build --locked --release --package hello-rs && \
-  cp ./target/release/hello-rs /app'
+  cargo build --locked --release && \
+  cp ./target/release/hello-rs /app
 
-FROM debian:bullseye-slim AS final
+FROM debian:bookworm-slim AS final
 RUN adduser \
   --disabled-password \
   --gecos "" \
@@ -24,6 +23,7 @@ RUN chown appuser /usr/local/bin/hello-rs
 COPY --from=builder /app/config /opt/hello-rs/config
 RUN chown -R appuser /opt/hello-rs/config
 USER appuser
+ENV RUST_LOG="hello_rs=debug,tower_http=debug,info"
 WORKDIR /opt/hello-rs
 ENTRYPOINT ["hello-rs"]
-EXPOSE 80/tcp
+EXPOSE 8080/tcp

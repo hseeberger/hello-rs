@@ -26,13 +26,13 @@ fix:
 
 all: check fmt lint test
 
-run:
+run port="8080":
 	RUST_LOG=hello_rs=debug,info \
-		APP__API__PORT=8080 \
+		APP__API__PORT={{port}} \
 		cargo run -p hello-rs \
 		| jq
 
-docker:
+docker tag="latest":
 	docker build \
-		-t hseeberger/hello-rs \
+		-t hseeberger/hello-rs:{{tag}} \
 		.
