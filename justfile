@@ -29,8 +29,7 @@ all: check fmt lint test
 run port="8080":
 	RUST_LOG=hello_rs=debug,info \
 		APP__API__PORT={{port}} \
-		cargo run -p hello-rs \
-		| jq
+		cargo run -p hello-rs
 
 docker tag="latest":
 	docker build \
