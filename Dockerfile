@@ -1,4 +1,4 @@
-ARG RUST_VERSION=1.74.0
+ARG RUST_VERSION=1.74.1
 
 FROM rust:${RUST_VERSION}-slim-bookworm AS builder
 WORKDIR /app
@@ -23,7 +23,7 @@ RUN chown appuser /usr/local/bin/hello-rs
 COPY --from=builder /app/config /opt/hello-rs/config
 RUN chown -R appuser /opt/hello-rs/config
 USER appuser
-ENV RUST_LOG="hello_rs=debug,tower_http=debug,info"
+ENV RUST_LOG="hello_rs=debug,info"
 WORKDIR /opt/hello-rs
 ENTRYPOINT ["hello-rs"]
 EXPOSE 8080/tcp
