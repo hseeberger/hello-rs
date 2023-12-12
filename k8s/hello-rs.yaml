@@ -52,7 +52,5 @@ spec:
               path: /
               port: http
           env:
-            - name: APP__API__PORT
-              value: "8080"
             - name: RUST_LOG
               value: hello_rs=debug,info
