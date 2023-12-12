@@ -23,7 +23,9 @@ pub async fn serve(config: Config) -> Result<()> {
         .nest("/v0", v0::app())
         .layer(ServiceBuilder::new().layer(TraceLayer::new_for_http()));
 
-    let listener = TcpListener::bind((addr, port)).await.context("bind")?;
+    let listener = TcpListener::bind((addr, port))
+        .await
+        .context("bind TcpListener")?;
     axum::serve(listener, app).await.context("run server")
 }
 
