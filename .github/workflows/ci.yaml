@@ -29,11 +29,6 @@ jobs:
         with:
           tool: just
 
-      - name: Install protoc
-        uses: arduino/setup-protoc@v2
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-
       - uses: Swatinem/rust-cache@v2
 
       - name: just check
@@ -75,11 +70,6 @@ jobs:
         with:
           tool: just
 
-      - name: Install protoc
-        uses: arduino/setup-protoc@v2
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-
       - uses: Swatinem/rust-cache@v2
 
       - name: just lint
@@ -98,11 +88,6 @@ jobs:
         uses: taiki-e/install-action@v2
         with:
           tool: just
-
-      - name: Install protoc
-        uses: arduino/setup-protoc@v2
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: Swatinem/rust-cache@v2
 

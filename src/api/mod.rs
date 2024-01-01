@@ -33,6 +33,7 @@ pub async fn serve(config: Config) -> Result<()> {
         .route("/", get(ready))
         .nest("/v0", v0::app())
         .layer(ServiceBuilder::new().layer(TraceLayer::new_for_http()));
+
     let app = api_version!(0..=0).layer(app);
 
     let listener = TcpListener::bind((addr, port))
