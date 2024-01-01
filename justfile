@@ -31,6 +31,6 @@ run port="8080":
 
 docker tag="latest":
 	docker build \
-		-t ghcr.io/scndcloud/hello-rs:{{tag}} \
+		-t hseeberger/hello-rs:{{tag}} \
 		-f Dockerfile \
 		.

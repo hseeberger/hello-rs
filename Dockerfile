@@ -7,7 +7,7 @@ RUN \
   --mount=type=cache,target=/app/target/ \
   --mount=type=cache,target=/usr/local/cargo/registry/ \
   cargo build --release && \
-  cp ./target/release/hello-rs /app
+  cp ./target/release/hello-rs /
 
 FROM debian:bookworm-slim AS final
 RUN adduser \
@@ -18,7 +18,7 @@ RUN adduser \
   --no-create-home \
   --uid "10001" \
   appuser
-COPY --from=builder /app/hello-rs /usr/local/bin
+COPY --from=builder /hello-rs /usr/local/bin
 RUN chown appuser /usr/local/bin/hello-rs
 COPY --from=builder /app/config /opt/hello-rs/config
 RUN chown -R appuser /opt/hello-rs
