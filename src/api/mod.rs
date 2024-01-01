@@ -1,7 +1,8 @@
 mod v0;
 
 use anyhow::{Context, Result};
-use axum::{http::StatusCode, response::IntoResponse, routing::get, Router};
+use api_version::{api_version, array_macro};
+use axum::{http::StatusCode, response::IntoResponse, routing::get, Router, ServiceExt};
 use serde::Deserialize;
 use std::{net::IpAddr, time::Duration};
 use tokio::{
@@ -9,7 +10,7 @@ use tokio::{
     signal::unix::{signal, SignalKind},
     time::sleep,
 };
-use tower::ServiceBuilder;
+use tower::{Layer, ServiceBuilder};
 use tower_http::trace::TraceLayer;
 
 #[derive(Debug, Deserialize)]
@@ -32,11 +33,12 @@ pub async fn serve(config: Config) -> Result<()> {
         .route("/", get(ready))
         .nest("/v0", v0::app())
         .layer(ServiceBuilder::new().layer(TraceLayer::new_for_http()));
+    let app = api_version!(0..=0).layer(app);
 
     let listener = TcpListener::bind((addr, port))
         .await
         .context("bind TcpListener")?;
-    axum::serve(listener, app)
+    axum::serve(listener, app.into_make_service())
         .with_graceful_shutdown(shutdown_signal(shutdown_timeout))
         .await
         .context("run server")
