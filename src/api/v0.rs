@@ -1,7 +1,9 @@
 use axum::{response::IntoResponse, routing::get, Router};
 
 pub fn app() -> Router {
-    Router::new().route("/hello", get(hello))
+    Router::new()
+        .route("/", get(hello))
+        .route("/hello", get(hello))
 }
 
 async fn hello() -> impl IntoResponse {

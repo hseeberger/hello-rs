@@ -24,7 +24,7 @@ fix:
 all: check fmt lint test
 
 run port="8080":
-	RUST_LOG=hello_rs=debug,info \
+	RUST_LOG=hello_rs=debug,api_version=debug,info \
 		APP__API__PORT={{port}} \
 		APP__PG_SERVICE_REPOSITORY__PASSWORD=hello-rs \
 		cargo run -p hello-rs

@@ -30,7 +30,6 @@ pub async fn serve(config: Config) -> Result<()> {
     } = config;
 
     let app = Router::new()
-        .route("/", get(ready))
         .nest("/v0", v0::app())
         .layer(ServiceBuilder::new().layer(TraceLayer::new_for_http()));
 
@@ -43,10 +42,6 @@ pub async fn serve(config: Config) -> Result<()> {
         .with_graceful_shutdown(shutdown_signal(shutdown_timeout))
         .await
         .context("run server")
-}
-
-async fn ready() -> impl IntoResponse {
-    StatusCode::OK
 }
 
 async fn shutdown_signal(shutdown_timeout: Option<Duration>) {

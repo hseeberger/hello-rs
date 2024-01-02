@@ -13,7 +13,7 @@ publish       = false
 
 [dependencies]
 anyhow             = { version = "1.0", features = [ "backtrace" ] }
-api-version        = { git = "https://github.com/scndcloud/api-version" }
+api-version        = { git = "https://github.com/scndcloud/api-version", branch = "feat/ready" }
 axum               = { version = "0.7", features = [ "http2", "json" ] }
 configured         = { version = "0.7" }
 humantime-serde    = { version = "1.1" }
