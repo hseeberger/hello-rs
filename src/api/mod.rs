@@ -1,8 +1,8 @@
 mod v0;
 
 use anyhow::{Context, Result};
-use api_version::{api_version, array_macro};
-use axum::{http::StatusCode, response::IntoResponse, routing::get, Router, ServiceExt};
+use api_version::api_version;
+use axum::{Router, ServiceExt};
 use serde::Deserialize;
 use std::{net::IpAddr, time::Duration};
 use tokio::{
