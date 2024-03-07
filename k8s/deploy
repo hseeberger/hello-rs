@@ -2,15 +2,15 @@
 
 usage() {
   echo "Deploy to k8s"
-  echo "  -c  Context for kubectl"
+  echo "  -n  k8s namespace"
   echo "  -v  Version of the Docker image, i.e. the value of the tag"
   echo "  -h  Print usage instructions"
 }
 
 while getopts "v:c:h" opt; do
   case $opt in
-  c)
-    KUBECTL_CONTEXT=$OPTARG
+  n)
+    namespace=$OPTARG
     ;;
   v)
     VERSION=$OPTARG
@@ -34,5 +34,9 @@ echo "Deploying version $VERSION"
 
 current_dir=$(pwd)
 cd $(dirname $0)
-kustomize build | envsubst | kubectl apply -f -
+if [ -z "$namespace" ]; then
+  kustomize build | envsubst | kubectl apply -f -
+else
+  kustomize build | envsubst | kubectl apply -n $namespace -f -
+fi
 cd $current_dir

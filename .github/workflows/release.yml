@@ -6,108 +6,183 @@ on:
       - v*
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  group: ${{github.workflow}}-${{github.head_ref || github.run_id}}
   cancel-in-progress: true
 
 jobs:
-  check:
+  toolchain:
     runs-on: ubuntu-latest
+    env:
+      nightly: ${{(github.event.inputs.nightly == 'true' || github.event_name == 'schedule') && 'true' || ''}}
+    outputs:
+      toolchain: ${{steps.set_toolchain.outputs.toolchain}}
+      nightly_toolchain: ${{steps.set_toolchain.outputs.nightly_toolchain}}
     steps:
       - uses: actions/checkout@v4
+      - name: Set toolchain
+        id: set_toolchain
+        env:
+          toolchain_toml: "rust-toolchain.toml"
+        run: |
+          if [[ -z $nightly ]] && [[ -f $toolchain_toml ]]; then
+            toolchain=$(grep channel $toolchain_toml | sed -r 's/channel = "(.*)"/\1/')
+            echo "using toolchain $toolchain from rust-toolchain.toml"
+            echo "toolchain=$toolchain" >> "$GITHUB_OUTPUT"
+            if [[ $toolchain =~ ^nightly.* ]]; then
+              echo "using nightly_toolchain $toolchain"
+              echo "nightly_toolchain=$toolchain" >> "$GITHUB_OUTPUT"
+            else
+              echo "using nightly_toolchain nightly"
+              echo "nightly_toolchain=nightly" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            toolchain='nightly'
+            echo "using toolchain nightly"
+            echo "toolchain=nightly" >> "$GITHUB_OUTPUT"
+            echo "using nightly_toolchain nightly"
+            echo "nightly_toolchain=nightly" >> "$GITHUB_OUTPUT"
+          fi
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+  check:
+    runs-on: ubuntu-latest
+    needs: toolchain
+    steps:
+      - uses: actions/checkout@v4
 
       - name: Install just
         uses: taiki-e/install-action@v2
         with:
           tool: just
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{needs.toolchain.outputs.toolchain}}
 
       - uses: Swatinem/rust-cache@v2
 
       - name: just check
-        run: just check
+        run: |
+          rustup override set ${{needs.toolchain.outputs.toolchain}}
+          just check
 
   fmt-check:
     runs-on: ubuntu-latest
+    needs: toolchain
     steps:
       - uses: actions/checkout@v4
-
-      - name: Install Rust (nightly for fmt)
-        uses: dtolnay/rust-toolchain@nightly
-        with:
-          components: rustfmt
 
       - name: Install just
         uses: taiki-e/install-action@v2
         with:
           tool: just
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{needs.toolchain.outputs.nightly_toolchain}}
+          components: rustfmt
 
       - uses: Swatinem/rust-cache@v2
 
       - name: just fmt-check
-        run: just fmt-check
+        run: |
+          rustup override set ${{needs.toolchain.outputs.nightly_toolchain}}
+          just fmt-check ''
 
   lint:
     runs-on: ubuntu-latest
-    needs: [check, fmt-check]
+    needs: [toolchain, check, fmt-check]
     steps:
       - uses: actions/checkout@v4
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          components: clippy
 
       - name: Install just
         uses: taiki-e/install-action@v2
         with:
           tool: just
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{needs.toolchain.outputs.toolchain}}
+          components: clippy
 
       - uses: Swatinem/rust-cache@v2
 
       - name: just lint
-        run: just lint
+        run: |
+          rustup override set ${{needs.toolchain.outputs.toolchain}}
+          just lint
 
   test:
     runs-on: ubuntu-latest
-    needs: [check, fmt-check]
+    needs: [toolchain, check, fmt-check]
     steps:
       - uses: actions/checkout@v4
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
 
       - name: Install just
         uses: taiki-e/install-action@v2
         with:
           tool: just
 
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{needs.toolchain.outputs.toolchain}}
+
       - uses: Swatinem/rust-cache@v2
 
       - name: just test
-        run: just test
+        run: |
+          rustup override set ${{needs.toolchain.outputs.toolchain}}
+          just test
+
+  # doc:
+  #   runs-on: ubuntu-latest
+  #   needs: [toolchain, check, fmt-check]
+  #   steps:
+  #     - uses: actions/checkout@v4
+
+  #     - name: Install just
+  #       uses: taiki-e/install-action@v2
+  #       with:
+  #         tool: just
+
+  #     - name: Install Rust
+  #       uses: dtolnay/rust-toolchain@master
+  #       with:
+  #         toolchain: ${{needs.toolchain.outputs.nightly_toolchain}}
+
+  #     - uses: Swatinem/rust-cache@v2
+
+  #     - name: just doc
+  #       run: |
+  #         rustup override set ${{needs.toolchain.outputs.nightly_toolchain}}
+  #         just doc ''
 
   release:
     runs-on: ubuntu-latest
+    # needs: [lint, test, doc]
     needs: [lint, test]
     steps:
+      - uses: actions/checkout@v4
+
       - name: Docker metadata
         uses: docker/metadata-action@v5
         id: meta
         with:
-          images: hseeberger/hello-rs
+          images: ghcr.io/scndcloud/${{github.event.repository.name}}
           tags: type=semver,pattern={{version}}
 
       - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: ${{secrets.DOCKERHUB_USERNAME}}
+          password: ${{secrets.DOCKERHUB_TOKEN}}
 
       - name: Docker build and push
         uses: docker/build-push-action@v5
         with:
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{steps.meta.outputs.tags}}
+          labels: ${{steps.meta.outputs.labels}}
           push: true
