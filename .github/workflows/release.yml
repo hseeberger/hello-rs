@@ -171,7 +171,7 @@ jobs:
         uses: docker/metadata-action@v5
         id: meta
         with:
-          images: ghcr.io/scndcloud/${{github.event.repository.name}}
+          images: hseeberger/hello-rs
           tags: type=semver,pattern={{version}}
 
       - name: Login to DockerHub
