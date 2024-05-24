@@ -9,8 +9,8 @@ on:
   pull_request:
     branches:
       - main
-  schedule:
-    - cron: 0 4/12 * * *
+  # schedule:
+  #   - cron: 0 4/12 * * *
   workflow_dispatch:
     inputs:
       nightly:
