@@ -1,33 +1,42 @@
 set shell := ["bash", "-uc"]
 
+rust_version := `grep channel rust-toolchain.toml | sed -r 's/channel = "(.*)"/\1/'`
+nightly := "nightly-2025-10-29"
+
 check:
-	cargo check
+	cargo check --tests
 
-fmt toolchain="+nightly":
-	cargo {{toolchain}} fmt
+fix:
+    cargo fix --allow-dirty --allow-staged --tests
 
-fmt-check toolchain="+nightly":
-	cargo {{toolchain}} fmt --check
+fmt:
+    cargo +{{nightly}} fmt
+
+fmt-check:
+    cargo +{{nightly}} fmt --check
 
 lint:
-	cargo clippy --no-deps -- -D warnings
+	cargo clippy --no-deps --tests -- -D warnings
+
+lint-fix:
+    cargo clippy --no-deps --tests --fix --allow-dirty --allow-staged
 
 test:
 	cargo test
 
-fix:
-	cargo fix --allow-dirty --allow-staged
-
 all: check fmt lint test
 
 run port="8080":
-	RUST_LOG=hello_rs=debug,api_version=debug,tower_http=debug,info \
-		APP__API__PORT={{port}} \
-		APP__PG_SERVICE_REPOSITORY__PASSWORD=hello-rs \
+	RUST_LOG=hello_rs=debug,api_version=debug,warn \
+		APP__INFRA__API__PORT={{port}} \
 		cargo run -p hello-rs
 
-docker tag="latest":
-	docker build \
-		-t hseeberger/hello-rs:{{tag}} \
-		-f Dockerfile \
-		.
+build-docker-image profile="dev":
+    tag=$(git rev-parse --short=8 HEAD) && \
+    docker build \
+        --build-arg "RUST_VERSION={{rust_version}}" \
+        --build-arg "PROFILE={{profile}}" \
+        -t hseeberger/hello-rs:${tag} \
+        -t hseeberger/hello-rs:latest \
+        -f Dockerfile \
+        .

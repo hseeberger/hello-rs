@@ -1,29 +1,30 @@
-ARG RUST_VERSION=1.78.0
+ARG RUST_VERSION
+FROM lukemathwalker/cargo-chef:0.1.73-rust-$RUST_VERSION-trixie AS chef
+WORKDIR /build
 
-FROM rust:${RUST_VERSION}-slim-bookworm AS builder
-WORKDIR /app
+FROM chef AS planner
 COPY . .
-RUN \
-  --mount=type=cache,target=/app/target/ \
-  --mount=type=cache,target=/usr/local/cargo/registry/ \
-  cargo build --release && \
-  cp ./target/release/hello-rs /
+RUN cargo chef prepare --recipe-path recipe.json
 
-FROM debian:bookworm-slim AS final
-RUN adduser \
-  --disabled-password \
-  --gecos "" \
-  --home "/nonexistent" \
-  --shell "/sbin/nologin" \
-  --no-create-home \
-  --uid "10001" \
-  appuser
-COPY --from=builder /hello-rs /usr/local/bin
-RUN chown appuser /usr/local/bin/hello-rs
-COPY --from=builder /app/config /opt/hello-rs/config
-RUN chown -R appuser /opt/hello-rs
+FROM chef AS builder
+SHELL ["/bin/bash", "-c"]
+ARG PROFILE=release
+COPY --from=planner /build/recipe.json recipe.json
+RUN cargo chef cook --profile $PROFILE --recipe-path recipe.json
+COPY . .
+RUN cargo build --locked --profile $PROFILE && \
+    mkdir -p /runtime/usr/local/bin && \
+    mv "./target/${PROFILE/dev/debug}/hello-rs" /runtime/usr/local/bin && \
+    mv /build/bin/entrypoint.sh /runtime/usr/local/bin && \
+    mkdir -p /runtime/opt/hello-rs && \
+    mv /build/config.yaml /runtime/opt/hello-rs
+
+FROM debian:trixie-slim@sha256:66b37a5078a77098bfc80175fb5eb881a3196809242fd295b25502854e12cbec AS runtime
+RUN useradd -u 10001 -d /nonexistent -s /usr/sbin/nologin -M -c "" appuser && \
+    passwd -l appuser && \
+    mkdir /var/run/hello-rs && \
+    chown appuser:appuser /var/run/hello-rs
+COPY --from=builder --chown=appuser:appuser /runtime /
 USER appuser
-ENV RUST_LOG="hello_rs=debug,info"
 WORKDIR /opt/hello-rs
-ENTRYPOINT ["hello-rs"]
-EXPOSE 8080/tcp
+ENTRYPOINT ["entrypoint.sh"]
