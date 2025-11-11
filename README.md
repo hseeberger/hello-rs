@@ -1,6 +1,6 @@
 # hello-rs
 
-Simple dockerized Rust/Axum based HTTP server for demo purposes.
+Simple dockerized Rust/axum based HTTP server for demo purposes.
 
 ## Run locally
 
