@@ -14,7 +14,7 @@ updates:
     schedule:
       interval: "daily"
     commit-message:
-      prefix: chore
+      prefix: ci
       include: scope
 
   - package-ecosystem: "docker"
