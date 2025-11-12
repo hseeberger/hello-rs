@@ -38,16 +38,17 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
 
       - name: Install Rust
-        uses: dtolnay/rust-toolchain@master
+        uses: dtolnay/rust-toolchain@6d653acede28d24f02e3cd41383119e8b1b35921
         with:
           toolchain: ${{needs.toolchain.outputs.toolchain}}
 
       - name: Install just
-        uses: taiki-e/install-action@v2
+        uses: taiki-e/install-action@6cc14f7f2f4b3129aff07a8b071d2d4f2733465d
         with:
           tool: just
 
-      - uses: Swatinem/rust-cache@v2
+      - name: Setup Rust cache
+        uses: Swatinem/rust-cache@f13886b937689c021905a6b90929199931d60db1
 
       - name: just check
         run: |
@@ -61,17 +62,18 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
 
       - name: Install Rust
-        uses: dtolnay/rust-toolchain@master
+        uses: dtolnay/rust-toolchain@6d653acede28d24f02e3cd41383119e8b1b35921
         with:
-          components: rustfmt
           toolchain: nightly-2025-10-29
+          components: rustfmt
 
       - name: Install just
-        uses: taiki-e/install-action@v2
+        uses: taiki-e/install-action@6cc14f7f2f4b3129aff07a8b071d2d4f2733465d
         with:
           tool: just
 
-      - uses: Swatinem/rust-cache@v2
+      - name: Setup Rust cache
+        uses: Swatinem/rust-cache@f13886b937689c021905a6b90929199931d60db1
 
       - name: just fmt-check
         run: |
@@ -85,17 +87,18 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
 
       - name: Install Rust
-        uses: dtolnay/rust-toolchain@master
+        uses: dtolnay/rust-toolchain@6d653acede28d24f02e3cd41383119e8b1b35921
         with:
           toolchain: ${{needs.toolchain.outputs.toolchain}}
           components: clippy
 
       - name: Install just
-        uses: taiki-e/install-action@v2
+        uses: taiki-e/install-action@6cc14f7f2f4b3129aff07a8b071d2d4f2733465d
         with:
           tool: just
 
-      - uses: Swatinem/rust-cache@v2
+      - name: Setup Rust cache
+        uses: Swatinem/rust-cache@f13886b937689c021905a6b90929199931d60db1
 
       - name: just lint
         run: |
@@ -110,16 +113,17 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
 
       - name: Install Rust
-        uses: dtolnay/rust-toolchain@master
+        uses: dtolnay/rust-toolchain@6d653acede28d24f02e3cd41383119e8b1b35921
         with:
           toolchain: ${{needs.toolchain.outputs.toolchain}}
 
       - name: Install just
-        uses: taiki-e/install-action@v2
+        uses: taiki-e/install-action@6cc14f7f2f4b3129aff07a8b071d2d4f2733465d
         with:
           tool: just
 
-      - uses: Swatinem/rust-cache@v2
+      - name: Setup Rust cache
+        uses: Swatinem/rust-cache@f13886b937689c021905a6b90929199931d60db1
 
       - name: just test
         run: |

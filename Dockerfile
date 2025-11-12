@@ -1,5 +1,5 @@
 ARG RUST_VERSION
-FROM lukemathwalker/cargo-chef:0.1.73-rust-$RUST_VERSION-trixie AS chef
+FROM lukemathwalker/cargo-chef:0.1.73-rust-$RUST_VERSION-trixie@sha256:233b3fece1e65a5a59885d58cfcb31d12a5704c431bcc7d8f0f52ec2142980fa AS chef
 WORKDIR /build
 
 FROM chef AS planner
