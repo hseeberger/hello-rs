@@ -19,7 +19,7 @@ RUN cargo build --locked --profile $PROFILE && \
     mkdir -p /runtime/opt/hello-rs && \
     mv /build/config.yaml /runtime/opt/hello-rs
 
-FROM debian:trixie-slim@sha256:a347fd7510ee31a84387619a492ad6c8eb0af2f2682b916ff3e643eb076f925a AS runtime
+FROM debian:trixie-slim@sha256:c0accef689e4f11b5efd1b6852e23f30c7495f2a9b1e6b1007299baab2ff4934 AS runtime
 RUN useradd -u 10001 -d /nonexistent -s /usr/sbin/nologin -M -c "" appuser && \
     passwd -l appuser && \
     mkdir /var/run/hello-rs && \
