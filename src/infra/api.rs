@@ -1,14 +1,10 @@
 mod v0;
 
 use anyhow::{Context, Result};
-use api_version::{ApiVersionFilter, ApiVersionLayer, ApiVersions};
-use axum::{
-    http::{StatusCode, Uri},
-    routing::get,
-    Router, ServiceExt,
-};
+use api_version::{ApiVersionLayer, ApiVersions};
+use axum::{http::StatusCode, routing::get, Router, ServiceExt};
 use serde::Deserialize;
-use std::{convert::Infallible, net::IpAddr};
+use std::net::IpAddr;
 use tokio::{
     net::TcpListener,
     signal::unix::{signal, SignalKind},
@@ -28,8 +24,8 @@ pub async fn serve(config: Config) -> Result<()> {
 
     let app = Router::new()
         .route("/ready", get(ready))
-        .nest("/v0", v0::app());
-    let app = ApiVersionLayer::new(API_VERSIONS, ReadyApiVersionFilterFilter).layer(app);
+        .nest("/api/v0", v0::app());
+    let app = ApiVersionLayer::new("/api", API_VERSIONS).layer(app);
 
     let listener = TcpListener::bind((addr, port))
         .await
@@ -38,17 +34,6 @@ pub async fn serve(config: Config) -> Result<()> {
         .with_graceful_shutdown(shutdown_signal())
         .await
         .context("run server")
-}
-
-#[derive(Clone)]
-struct ReadyApiVersionFilterFilter;
-
-impl ApiVersionFilter for ReadyApiVersionFilterFilter {
-    type Error = Infallible;
-
-    async fn should_rewrite(&self, uri: &Uri) -> Result<bool, Self::Error> {
-        Ok(uri.path() != "/ready")
-    }
 }
 
 async fn ready() -> StatusCode {
