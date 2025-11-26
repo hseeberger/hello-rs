@@ -113,6 +113,8 @@ jobs:
     name: Build and push Docker image
     needs: [toolchain, fmt-check, lint, test]
     runs-on: ubuntu-latest
+    env:
+      IS_PUSH_TO_MAIN_OR_TAG: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') || startsWith(github.ref, 'refs/tags/v') }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
@@ -155,20 +157,20 @@ jobs:
       - name: Build and push Docker Image
         uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
         env:
-          IS_RELEASE: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') || startsWith(github.ref, 'refs/tags/v') }}
+          PROFILE: ${{ env.IS_PUSH_TO_MAIN_OR_TAG && 'release' || 'dev' }}
         with:
           context: .
           file: ./Dockerfile
-          push: ${{ env.IS_RELEASE }}
+          push: ${{ env.IS_PUSH_TO_MAIN_OR_TAG }}
           build-args: |
             RUST_VERSION=${{ needs.toolchain.outputs.toolchain }}
-            PROFILE=${{ env.IS_RELEASE && 'release' || 'dev' }}
+            PROFILE=${{ env.PROFILE }}
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: |
             type=registry,ref=hseeberger/hello-rs:buildcache
-            type=registry,ref=hseeberger/hello-rs:buildcache-${{ env.IS_RELEASE && 'release' || 'dev' }}
+            type=registry,ref=hseeberger/hello-rs:buildcache-${{ env.PROFILE }}
           cache-to: |
             type=registry,ref=hseeberger/hello-rs:buildcache,mode=min
-            type=registry,ref=hseeberger/hello-rs:buildcache-${{ env.IS_RELEASE && 'release' || 'dev' }},mode=max
+            type=registry,ref=hseeberger/hello-rs:buildcache-${{ env.PROFILE }},mode=max
