@@ -432,7 +432,7 @@ dependencies = [
 
 [[package]]
 name = "hello-rs"
-version = "0.7.0"
+version = "0.7.1"
 dependencies = [
  "anyhow",
  "api-version",
