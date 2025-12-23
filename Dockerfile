@@ -19,12 +19,10 @@ RUN cargo build --locked --profile $PROFILE && \
     mkdir -p /runtime/opt/hello-rs && \
     mv /build/config.yaml /runtime/opt/hello-rs
 
-FROM debian:trixie-slim@sha256:e711a7b30ec1261130d0a121050b4ed81d7fb28aeabcf4ea0c7876d4e9f5aca2 AS runtime
-RUN useradd -u 10001 -d /nonexistent -s /usr/sbin/nologin -M -c "" appuser && \
-    passwd -l appuser && \
-    mkdir /var/run/hello-rs && \
-    chown appuser:appuser /var/run/hello-rs
-COPY --from=builder --chown=appuser:appuser /runtime /
-USER appuser
+FROM dhi.io/debian-base:trixie@sha256:9bbe6d9dc0d7c341be923f144089a04a91985fe4b7509beacb6154c562f6b475 AS runtime
+COPY --from=builder --chown=10001:10001 /runtime /
+RUN mkdir -p /var/run/hello-rs && \
+    chown 10001:10001 /var/run/hello-rs
+USER 10001:10001
 WORKDIR /opt/hello-rs
 ENTRYPOINT ["entrypoint.sh"]
