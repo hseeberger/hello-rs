@@ -50,7 +50,7 @@ jobs:
           components: rustfmt
 
       - name: Install just
-        uses: taiki-e/install-action@30791125b88ed3200de59e9b5edbf78d1949e41f # v2.67.1
+        uses: taiki-e/install-action@0bc4cd8a3e21db4cb9519857377b0c8c5e150de5 # v2.67.2
         with:
           tool: just
 
@@ -76,7 +76,7 @@ jobs:
           components: clippy
 
       - name: Install just
-        uses: taiki-e/install-action@30791125b88ed3200de59e9b5edbf78d1949e41f # v2.67.1
+        uses: taiki-e/install-action@0bc4cd8a3e21db4cb9519857377b0c8c5e150de5 # v2.67.2
         with:
           tool: just
 
@@ -102,7 +102,7 @@ jobs:
           toolchain: ${{needs.toolchain.outputs.toolchain}}
 
       - name: Install just
-        uses: taiki-e/install-action@30791125b88ed3200de59e9b5edbf78d1949e41f # v2.67.1
+        uses: taiki-e/install-action@0bc4cd8a3e21db4cb9519857377b0c8c5e150de5 # v2.67.2
         with:
           tool: just
 
