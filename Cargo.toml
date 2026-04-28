@@ -2,7 +2,7 @@
 name          = "hello-rs"
 version       = "0.7.1"
 description   = "Simple dockerized Rust/axum based HTTP server for demo purposes"
-edition       = "2021"
+edition       = "2024"
 authors       = [ "Heiko Seeberger <git@heikoseeberger.de>" ]
 license       = "Apache-2.0"
 readme        = "README.md"

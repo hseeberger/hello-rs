@@ -1,6 +1,6 @@
 use figment::{
-    providers::{Env, Format, Yaml},
     Figment,
+    providers::{Env, Format, Yaml},
 };
 use serde::Deserialize;
 use std::env;
@@ -33,7 +33,7 @@ impl<T> ConfigExt for T where T: for<'de> Deserialize<'de> {}
 
 #[cfg(test)]
 mod tests {
-    use crate::config::{ConfigExt, CONFIG_FILE};
+    use crate::config::{CONFIG_FILE, ConfigExt};
     use assert_matches::assert_matches;
     use serde::Deserialize;
     use std::env;
