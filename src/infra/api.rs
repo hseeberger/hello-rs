@@ -2,12 +2,12 @@ mod v0;
 
 use anyhow::{Context, Result};
 use api_version::{ApiVersionLayer, ApiVersions};
-use axum::{http::StatusCode, routing::get, Router, ServiceExt};
+use axum::{Router, ServiceExt, http::StatusCode, routing::get};
 use serde::Deserialize;
 use std::net::IpAddr;
 use tokio::{
     net::TcpListener,
-    signal::unix::{signal, SignalKind},
+    signal::unix::{SignalKind, signal},
 };
 use tower::Layer;
 

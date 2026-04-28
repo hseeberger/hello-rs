@@ -1,4 +1,4 @@
-use axum::{response::IntoResponse, routing::get, Router};
+use axum::{Router, response::IntoResponse, routing::get};
 
 pub fn app() -> Router {
     Router::new()
