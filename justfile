@@ -7,7 +7,7 @@ check:
 	cargo check --tests
 
 fix:
-    cargo fix --allow-dirty --allow-staged --tests
+    cargo fix --tests --allow-dirty --allow-staged
 
 fmt:
     cargo +{{nightly}} fmt
@@ -16,15 +16,18 @@ fmt-check:
     cargo +{{nightly}} fmt --check
 
 lint:
-	cargo clippy --no-deps --tests -- -D warnings
+	cargo clippy --tests --no-deps -- -D warnings
 
 lint-fix:
-    cargo clippy --no-deps --tests --fix --allow-dirty --allow-staged
+    cargo clippy --tests --no-deps --fix --allow-dirty --allow-staged
 
 test:
 	cargo test
 
-all: check fmt lint test
+doc:
+	cargo doc --no-deps
+
+all: check fmt lint test doc
 
 run port="8080":
 	RUST_LOG=hello_rs=debug,api_version=debug,warn \
