@@ -33,5 +33,6 @@ struct Config {
 async fn run() -> Result<()> {
     let config = Config::load().context("load configuration")?;
     info!(config:?; "starting");
+
     infra::api::serve(config.infra.api).await
 }

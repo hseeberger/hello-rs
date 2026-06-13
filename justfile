@@ -32,7 +32,7 @@ all: check fmt lint test doc
 run port="8080":
 	RUST_LOG=hello_rs=debug,api_version=debug,warn \
 		APP__INFRA__API__PORT={{port}} \
-		cargo run -p hello-rs
+		cargo run -p hello-rs | tee ./target/hello-rs.log
 
 build-docker-image profile="dev":
     tag=$(git rev-parse --short=8 HEAD) && \

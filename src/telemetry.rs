@@ -1,4 +1,4 @@
-use logforth::{append::Stdout, filter::env_filter::EnvFilterBuilder, layout::JsonLayout};
+use logforth::{append::Stdout, filter::rustlog::RustLogFilterBuilder, layout::JsonLayout};
 
 /// Initialize logging with [Logforth](https://github.com/fast/logforth).
 ///
@@ -12,7 +12,7 @@ pub fn init_logging() {
     logforth::starter_log::builder()
         .dispatch(|dispatch| {
             dispatch
-                .filter(EnvFilterBuilder::from_default_env().build())
+                .filter(RustLogFilterBuilder::from_default_env().build())
                 .append(Stdout::default().with_layout(JsonLayout::default()))
         })
         .apply();
