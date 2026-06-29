@@ -19,9 +19,24 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  single-commit:
+    name: Enforce single commit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enforce exactly one commit for a PR
+        if: github.event_name == 'pull_request'
+        run: |
+          COUNT="${{ github.event.pull_request.commits }}"
+          echo "PR contains $COUNT commit(s)"
+          if [ "$COUNT" -ne 1 ]; then
+            echo "::error::PRs must contain exactly one commit. Squash locally (git rebase -i) and force-push."
+            exit 1
+          fi
+
   toolchain:
     name: Setup Rust toolchain
     runs-on: ubuntu-latest
+    needs: single-commit
     outputs:
       stable: ${{ steps.set_toolchain.outputs.stable }}
       nightly: ${{ steps.set_toolchain.outputs.nightly }}
@@ -31,8 +46,6 @@ jobs:
 
       - name: Output toolchain
         id: set_toolchain
-        env:
-          toolchain_toml: "rust-toolchain.toml"
         run: |
           stable=$(grep channel rust-toolchain.toml | sed -r 's/channel = "(.*)"/\1/')
           echo "stable=$stable" | tee -a "$GITHUB_OUTPUT"
@@ -48,13 +61,13 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Install Rust
-        uses: dtolnay/rust-toolchain@67ef31d5b988238dd797d409d6f9574278e20537
+        uses: dtolnay/rust-toolchain@67ef31d5b988238dd797d409d6f9574278e20537 # master
         with:
           toolchain: ${{ needs.toolchain.outputs.nightly }}
           components: rustfmt
 
       - name: Install just
-        uses: taiki-e/install-action@b8cecb83565409bcc297b2df6e77f030b2a468d5 # v2.82.0
+        uses: taiki-e/install-action@ace6ebe54a6a0c86dfb5f7764b17f793b6925bc3 # v2.82.3
         with:
           tool: just
 
@@ -66,21 +79,21 @@ jobs:
           just fmt-check
 
   lint:
-    runs-on: ubuntu-latest
     name: Lint Code
+    runs-on: ubuntu-latest
     needs: toolchain
     steps:
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Install Rust
-        uses: dtolnay/rust-toolchain@67ef31d5b988238dd797d409d6f9574278e20537
+        uses: dtolnay/rust-toolchain@67ef31d5b988238dd797d409d6f9574278e20537 # master
         with:
           toolchain: ${{ needs.toolchain.outputs.stable }}
           components: clippy
 
       - name: Install just
-        uses: taiki-e/install-action@b8cecb83565409bcc297b2df6e77f030b2a468d5 # v2.82.0
+        uses: taiki-e/install-action@ace6ebe54a6a0c86dfb5f7764b17f793b6925bc3 # v2.82.3
         with:
           tool: just
 
@@ -93,20 +106,20 @@ jobs:
           just lint
 
   test:
-    runs-on: ubuntu-latest
     name: Run Tests
+    runs-on: ubuntu-latest
     needs: toolchain
     steps:
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Install Rust
-        uses: dtolnay/rust-toolchain@67ef31d5b988238dd797d409d6f9574278e20537
+        uses: dtolnay/rust-toolchain@67ef31d5b988238dd797d409d6f9574278e20537 # master
         with:
           toolchain: ${{ needs.toolchain.outputs.stable }}
 
       - name: Install just
-        uses: taiki-e/install-action@b8cecb83565409bcc297b2df6e77f030b2a468d5 # v2.82.0
+        uses: taiki-e/install-action@ace6ebe54a6a0c86dfb5f7764b17f793b6925bc3 # v2.82.3
         with:
           tool: just
 
@@ -117,6 +130,33 @@ jobs:
         run: |
           rustup override set ${{ needs.toolchain.outputs.stable }}
           just test
+
+  doc:
+    name: Create Documentation
+    runs-on: ubuntu-latest
+    needs: toolchain
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@67ef31d5b988238dd797d409d6f9574278e20537 # master
+        with:
+          toolchain: ${{ needs.toolchain.outputs.stable }}
+          components: rust-docs
+
+      - name: Install just
+        uses: taiki-e/install-action@ace6ebe54a6a0c86dfb5f7764b17f793b6925bc3 # v2.82.3
+        with:
+          tool: just
+
+      - name: Setup Rust cache
+        uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1
+
+      - name: just doc
+        run: |
+          rustup override set ${{ needs.toolchain.outputs.stable }}
+          just doc
 
   build-and-push:
     name: Build and push Docker image
