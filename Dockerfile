@@ -16,8 +16,8 @@ RUN cargo build --locked --profile $PROFILE && \
     mkdir -p /runtime/usr/local/bin && \
     mv "./target/${PROFILE/dev/debug}/hello-rs" /runtime/usr/local/bin && \
     mv /build/bin/entrypoint.sh /runtime/usr/local/bin && \
-    mkdir -p /runtime/opt/hello-rs && \
-    mv /build/config.yaml /runtime/opt/hello-rs
+    mkdir -p /runtime/opt/hello-rs/config && \
+    mv /build/config/default.yaml /runtime/opt/hello-rs/config
 
 FROM dhi.io/debian-base:trixie@sha256:9bbe6d9dc0d7c341be923f144089a04a91985fe4b7509beacb6154c562f6b475 AS runtime
 COPY --from=builder --chown=10001:10001 /runtime /

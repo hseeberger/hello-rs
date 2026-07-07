@@ -21,7 +21,7 @@ Example:
 
 ```
 RUST_LOG=hello_rs=debug,info \
-  APP__API__PORT=8080 \
+  CFG__INFRA__API__PORT=8080 \
   cargo run -p hello-rs \
   | jq
 ```
