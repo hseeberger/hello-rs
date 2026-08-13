@@ -11,12 +11,12 @@ documentation = "https://github.com/hseeberger/hello-rs"
 publish       = false
 
 [dependencies]
-anyhow      = { version = "1.0", features = [ "backtrace" ] }
-api-version = { version = "0.3" }
-axum        = { version = "0.8", features = [ "http2", "json" ] }
-configured  = { version = "0.9" }
-log         = { version = "0.4" }
-logforth    = { version = "0.30", features = [ "starter-log" ] }
-serde       = { version = "1.0", features = [ "derive" ] }
-tokio       = { version = "1", features = [ "macros", "rt-multi-thread", "signal" ] }
-tower       = { version = "0.5" }
+anyhow             = { version = "1.0", features = [ "backtrace" ] }
+api-version        = { version = "0.3" }
+axum               = { version = "0.8", features = [ "http2", "json" ] }
+configured         = { version = "0.9" }
+serde              = { version = "1.0", features = [ "derive" ] }
+tokio              = { version = "1", features = [ "macros", "rt-multi-thread", "signal" ] }
+tower              = { version = "0.5" }
+tracing            = { version = "0.1" }
+tracing-subscriber = { version = "0.3", features = [ "env-filter", "fmt", "json" ] }
