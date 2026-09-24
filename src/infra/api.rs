@@ -1,6 +1,6 @@
 mod v0;
 
-use anyhow::{Context, Result};
+use anyhow::Context;
 use api_version::{ApiVersionLayer, ApiVersions};
 use axum::{Router, ServiceExt, http::StatusCode, routing::get};
 use serde::Deserialize;
@@ -20,7 +20,7 @@ pub struct Config {
     pub port: u16,
 }
 
-pub async fn serve(config: Config) -> Result<()> {
+pub async fn serve(config: Config) -> anyhow::Result<()> {
     let Config { addr, port } = config;
 
     let app = Router::new()

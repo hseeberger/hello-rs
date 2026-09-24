@@ -411,6 +411,7 @@ dependencies = [
  "axum",
  "configured",
  "serde",
+ "serde_json",
  "tokio",
  "tower",
  "tracing",
