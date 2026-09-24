@@ -7,6 +7,7 @@ use serde::Deserialize;
 use std::net::IpAddr;
 use tokio::{
     net::TcpListener,
+    select,
     signal::unix::{SignalKind, signal},
 };
 use tower::Layer;
@@ -41,8 +42,10 @@ async fn ready() -> StatusCode {
 }
 
 async fn shutdown_signal() {
-    signal(SignalKind::terminate())
-        .expect("install SIGTERM handler")
-        .recv()
-        .await;
+    let mut sigterm = signal(SignalKind::terminate()).expect("install SIGTERM handler");
+    let mut sigint = signal(SignalKind::interrupt()).expect("install SIGINT handler");
+    select! {
+        _ = sigterm.recv() => {}
+        _ = sigint.recv() => {}
+    }
 }
