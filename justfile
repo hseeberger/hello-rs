@@ -44,3 +44,21 @@ build-docker-image profile="dev":
         -t hseeberger/hello-rs:latest \
         -f Dockerfile \
         .
+
+release-pr:
+    release-plz release-pr --git-token "$(gh auth token)"
+
+release:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    git fetch --quiet --tags origin main
+    if [[ $(git branch --show-current) != main || -n $(git status --porcelain) || $(git rev-parse HEAD) != $(git rev-parse origin/main) ]]; then
+        echo "error: must run on a clean main that is up to date with origin/main" >&2
+        exit 1
+    fi
+    version=$(grep '^version' Cargo.toml | sed -E 's/version *= *"(.*)"/\1/')
+    commit=$(git log -1 --format=%H -G '^version' -- Cargo.toml)
+    git tag -a "v$version" -m "chore: release v$version" "$commit"
+    git push origin "v$version"
+    awk -v heading="## [$version]" 'index($0, heading) == 1 { found = 1; next } /^## \[/ { found = 0 } found' CHANGELOG.md |
+        gh release create "v$version" --title "$version" --notes-file - --verify-tag
