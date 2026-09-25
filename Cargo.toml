@@ -1,7 +1,7 @@
 [package]
 name          = "hello-rs"
 description   = "Simple dockerized Rust/axum based HTTP server for demo purposes"
-version       = "0.7.1"
+version       = "0.8.0"
 edition       = "2024"
 license       = "Apache-2.0"
 readme        = "README.md"
