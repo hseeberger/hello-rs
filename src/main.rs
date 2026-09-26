@@ -1,7 +1,7 @@
 mod infra;
 
 use anyhow::Context;
-use configured::{Case, Configured};
+use configured::{Configured, LoadOptions};
 use serde::Deserialize;
 use serde_json::json;
 use std::{panic, process::ExitCode};
@@ -10,7 +10,7 @@ use tracing_subscriber::{EnvFilter, layer::SubscriberExt, util::SubscriberInitEx
 
 #[tokio::main]
 async fn main() -> ExitCode {
-    let Ok(config) = Config::load(Case::Snake)
+    let Ok(config) = Config::load(LoadOptions::default())
         .context("load configuration")
         .inspect_err(log_error)
     else {
