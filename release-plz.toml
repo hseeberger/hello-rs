@@ -20,8 +20,11 @@ trim = false
 postprocessors = [ { pattern = '(?s).*', replace_command = "scripts/pr-links.sh" } ]
 protect_breaking_commits = true
 commit_parsers = [
-    { message = "^chore(\\(release\\))?: (release|prepare for)", skip = true },
-    { message = "^build\\(deps\\)", group = "<!-- 9 -->Dependencies" },
+    { message = "^Merge pull request ", skip = true },
+    { message = "^chore(\\(release\\))?: (?i:release|prepare for)", skip = true },
+    { message = "^release:", skip = true },
+    { message = "^build\\(deps\\)", field = "breaking", pattern = "true", group = "<!-- 7 -->Dependencies" },
+    { message = "^(build|ci|test)", field = "breaking", pattern = "true", group = "<!-- 8 -->Other" },
     { message = "^(build|ci|test)", skip = true },
     { message = "^feat", group = "<!-- 0 -->Features" },
     { message = "^fix", group = "<!-- 1 -->Bug Fixes" },
